@@ -186,6 +186,7 @@ echo "Cloning the repo on the box... ";
 remoteExec($sshConnection, 'cd /var/www && git clone --recurse-submodules https://github.com/jrbasso/cake_benchmark.git');
 remoteExec($sshConnection, 'chown www-data.www-data /var/www -R');
 remoteExec($sshConnection, 'chmod 0777 /var/www/cake_benchmark/cake3/App/tmp -R');
+remoteExec($sshConnection, 'mysql -uroot -proot -e "CREATE DATABASE cake_benchmark"');
 echo "OK\n";
 
 echo "Installing dependencies for the test... ";
@@ -197,4 +198,4 @@ remoteExec($sshConnection, 'wget https://webgrind.googlecode.com/files/webgrind-
 remoteExec($sshConnection, 'unzip /tmp/webgrind-release-1.0.zip -d /var/www/');
 echo "OK\n";
 
-echo "Server startup done. You can access at http://{$instanceHostname}\n";
+echo "Server startup done. You can access at http://{$instanceHostname}/webgrind\n";
