@@ -176,7 +176,7 @@ remoteExec($sshConnection, 'apt-get update && apt-get upgrade -y');
 remoteExec($sshConnection, 'apt-get install -y debconf-utils');
 remoteExec($sshConnection, 'echo "mysql-server-5.5 mysql-server/root_password_again password root" | debconf-set-selections');
 remoteExec($sshConnection, 'echo "mysql-server-5.5 mysql-server/root_password password root" | debconf-set-selections');
-remoteExec($sshConnection, 'apt-get install -q -y apache2 php5 mysql-server git');
+remoteExec($sshConnection, 'apt-get install -q -y apache2 php5 php5-mysqlnd mysql-server git');
 remoteExec($sshConnection, 'ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/rewrite.load');
 remoteExec($sshConnection, 'sed -i "s/AllowOverride None/AllowOverride All/" default');
 remoteExec($sshConnection, 'service apache2 restart');
