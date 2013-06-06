@@ -177,11 +177,15 @@ remoteExec($sshConnection, 'apt-get install -y debconf-utils');
 remoteExec($sshConnection, 'echo "mysql-server-5.5 mysql-server/root_password_again password root" | debconf-set-selections');
 remoteExec($sshConnection, 'echo "mysql-server-5.5 mysql-server/root_password password root" | debconf-set-selections');
 remoteExec($sshConnection, 'apt-get install -q -y apache2 php5 mysql-server git');
-
+remoteExec($sshConnection, 'ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/rewrite.load');
+remoteExec($sshConnection, 'sed -i "s/AllowOverride None/AllowOverride All/" default');
+remoteExec($sshConnection, 'service apache2 restart');
 echo "OK\n";
 
 echo "Cloning the repo on the box... ";
 remoteExec($sshConnection, 'cd /var/www && git clone --recurse-submodules https://github.com/jrbasso/cake_benchmark.git');
+remoteExec($sshConnection, 'chown www-data.www-data /var/www -R');
+remoteExec($sshConnection, 'chmod 0777 /var/www/cake_benchmark/cake3/App/tmp -R');
 echo "OK\n";
 
 echo "Installing dependencies for the test... ";
