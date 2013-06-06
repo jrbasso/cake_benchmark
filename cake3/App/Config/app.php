@@ -80,8 +80,8 @@ use Cake\Core\Configure;
  *   the xor cipher functions in Security.
  */
 	Configure::write('Security', [
-		'salt' => 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi',
-		'cipherSeed' => '76859309657453542496749683645',
+		'salt' => 'cake_benchmark',
+		'cipherSeed' => '12345',
 	]);
 
 /**
