@@ -181,8 +181,16 @@ remoteExec($sshConnection, 'apt-get install -q -y apache2 php5 mysql-server git'
 echo "OK\n";
 
 echo "Cloning the repo on the box... ";
-$gitRepo = `git config --get remote.origin.url`;
-remoteExec($sshConnection, 'cd /var/www && git clone ' . $gitRepo);
+remoteExec($sshConnection, 'cd /var/www && git clone --recurse-submodules https://github.com/jrbasso/cake_benchmark.git');
+echo "OK\n";
+
+echo "Installing dependencies for the test... ";
+remoteExec($sshConnection, 'apt-get install -q -y php-pear php5-dev make unzip');
+remoteExec($sshConnection, 'pecl install xdebug');
+ssh2_scp_send($sshConnection, __DIR__ . '/contrib/1-xdebug.ini', '/etc/php/conf.d/1-xdebug.ini');
+remoteExec($sshConnection, 'service apache2 restart');
+remoteExec($sshConnection, 'wget https://webgrind.googlecode.com/files/webgrind-release-1.0.zip -O /tmp/webgrind-release-1.0.zip');
+remoteExec($sshConnection, 'unzip /tmp/webgrind-release-1.0.zip -d /var/www/');
 echo "OK\n";
 
 echo "Server startup done. You can access at http://{$instanceHostname}\n";
