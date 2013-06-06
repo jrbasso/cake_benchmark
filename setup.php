@@ -151,9 +151,38 @@ while ($tries-- > 0) {
 }
 echo $instanceHostname, "\n";
 
-echo "Executing the basic setup (this may take a few minutes)... ";
-$command = 'add-apt-repository ppa:ondrej/php5 -y && apt-get update && apt-get upgrade -y && apt-get install -y apache2 php5 mysql-server';
-exec('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ' . escapeshellarg(__DIR__ . '/aws_rsa') . " root@{$instanceHostname} " . escapeshellcmd($command));
+echo "Connecting to the box... ";
+while (!$sshConnection = @ssh2_connect($instanceHostname)) {
+	echo "FAIL ";
+	sleep(10);
+}
+ssh2_auth_pubkey_file($sshConnection, 'root', __DIR__ . '/aws_rsa.pub', __DIR__ . '/aws_rsa');
 echo "OK\n";
 
-//$gitRepo = `git config --get remote.origin.url`;
+echo "Executing the basic setup (this may take a few minutes)... ";
+function remoteExec($conn, $command) {
+	$stream = ssh2_exec($conn, $command);
+	$errorStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
+	stream_set_blocking($errorStream, true);
+	stream_set_blocking($stream, true);
+	stream_get_contents($stream);
+	stream_get_contents($errorStream);
+	fclose($stream);
+	fclose($errorStream);
+}
+
+remoteExec($sshConnection, 'add-apt-repository ppa:ondrej/php5 -y');
+remoteExec($sshConnection, 'apt-get update && apt-get upgrade -y');
+remoteExec($sshConnection, 'apt-get install -y debconf-utils');
+remoteExec($sshConnection, 'echo "mysql-server-5.5 mysql-server/root_password_again password root" | debconf-set-selections');
+remoteExec($sshConnection, 'echo "mysql-server-5.5 mysql-server/root_password password root" | debconf-set-selections');
+remoteExec($sshConnection, 'apt-get install -q -y apache2 php5 mysql-server git');
+
+echo "OK\n";
+
+echo "Cloning the repo on the box... ";
+$gitRepo = `git config --get remote.origin.url`;
+remoteExec($sshConnection, 'cd /var/www && git clone ' . $gitRepo);
+echo "OK\n";
+
+echo "Server startup done. You can access at http://{$instanceHostname}\n";
