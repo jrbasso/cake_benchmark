@@ -12,6 +12,9 @@ class DbShell extends AppShell {
 		$query = new Query($mysql);
 		$query->select(['category_id', 'name'])->from('category')->limit(20);
 		$query->execute();
+		foreach ($query as $row) {
+			$this->out("{$row['category_id']} - {$row['name']}");
+		}
 	}
 
 }
