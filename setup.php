@@ -186,7 +186,6 @@ echo "Cloning the repo on the box... ";
 remoteExec($sshConnection, 'cd /var/www && git clone --recurse-submodules https://github.com/jrbasso/cake_benchmark.git');
 remoteExec($sshConnection, 'chown www-data.www-data /var/www -R');
 remoteExec($sshConnection, 'chmod 0777 /var/www/cake_benchmark/cake3/App/tmp -R');
-remoteExec($sshConnection, 'mysql -uroot -proot -e "CREATE DATABASE cake_benchmark"');
 echo "OK\n";
 
 echo "Installing dependencies for the test... ";
@@ -195,11 +194,15 @@ remoteExec($sshConnection, 'pecl install xdebug');
 ssh2_scp_send($sshConnection, __DIR__ . '/contrib/1-xdebug.ini', '/etc/php5/conf.d/1-xdebug.ini');
 remoteExec($sshConnection, 'service apache2 restart');
 remoteExec($sshConnection, 'wget https://webgrind.googlecode.com/files/webgrind-release-1.0.zip -O /tmp/webgrind-release-1.0.zip');
-remoteExec($sshConnection, 'unzip /tmp/webgrind-release-1.0.zip -d /var/www/');
+remoteExec($sshConnection, 'unzip -o /tmp/webgrind-release-1.0.zip -d /var/www/');
+remoteExec($sshConnection, 'wget http://downloads.mysql.com/docs/sakila-db.tar.gz -O /tmp/sakila-db.tar.gz');
+remoteExec($sshConnection, 'tar zxvf /tmp/sakila-db.tar.gz -C /tmp/');
+remoteExec($sshConnection, 'mysql -uroot -proot < /tmp/sakila-db/sakila-schema.sql');
+remoteExec($sshConnection, 'mysql -uroot -proot < /tmp/sakila-db/sakila-data.sql');
 echo "OK\n";
 
 echo "Executing tests... ";
-remoteExec($sshConnection, '/var/www/cake_benchmark/cake3/App/Console/cake db simpleQuery');
+remoteExec($sshConnection, 'php /var/www/cake_benchmark/runTests.php');
 echo "OK\n";
 
 echo "Server startup done. You can access at http://{$instanceHostname}/webgrind\n";

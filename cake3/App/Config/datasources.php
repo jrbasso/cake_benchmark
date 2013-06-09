@@ -71,7 +71,7 @@ Configure::write('Datasource.default', [
 	'host' => 'localhost',
 	'login' => 'root',
 	'password' => 'root',
-	'database' => 'cake_benchmark',
+	'database' => 'sakila',
 	'prefix' => '',
 	//'encoding' => 'utf8',
 ]);

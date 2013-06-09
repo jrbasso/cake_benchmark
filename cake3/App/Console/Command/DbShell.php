@@ -10,8 +10,8 @@ class DbShell extends AppShell {
 	public function simpleQuery() {
 		$mysql = ConnectionManager::getDataSource('default');
 		$query = new Query($mysql);
-		$query->select(['id'])->from('articles')->where(['reads >' => 0]);
-		echo $query;
+		$query->select(['category_id', 'name'])->from('category')->limit(20);
+		$query->execute();
 	}
 
 }
